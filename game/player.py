@@ -14,6 +14,7 @@ class Player(physicalobject.PhysicalObject):
         # Forward thrust
         self.thrust = 150.0
         self.max_thrust = 300.0
+        self.max_velocity = 500.0
         # Slow down
         self.alt_thrust = 50.0 
         self.rotate_speed = 200.0
@@ -128,12 +129,22 @@ class Player(physicalobject.PhysicalObject):
 
 
 
-        if self.key_handler[key.UP]:
+        elif self.key_handler[key.UP]:
             angle_radians = -math.radians(self.rotation)
             force_x = math.cos(angle_radians) * self.thrust * dt
             force_y = math.sin(angle_radians) * self.thrust * dt
-            self.velocity_x += force_x
-            self.velocity_y += force_y
+            if self.velocity_x <= self.max_velocity and self.velocity_x >= -self.max_velocity and force_x < 0:
+                print "1"
+                self.velocity_x += force_x
+            elif self.velocity_x <= self.max_velocity and self.velocity_x >= -self.max_velocity and force_x > 0:
+                print "2"
+                self.velocity_x += force_x
+            if self.velocity_y <= self.max_velocity and self.velocity_y >= -self.max_velocity and force_y < 0:
+                print "3"
+                self.velocity_y += force_y
+            elif self.velocity_y <= self.max_velocity and self.velocity_y >= -self.max_velocity and force_y > 0:
+                print "4"
+                self.velocity_y += force_y
             print self.rotation
             #print "math.cos(angle_radians) - ", math.cos(angle_radians)
             #print "math.sin(angle_radians) - ", math.sin(angle_radians)
@@ -145,7 +156,7 @@ class Player(physicalobject.PhysicalObject):
             self.engine_sprite.y = self.y
             self.engine_sprite.visible = True
         else:
-             self.engine_sprite.visible = False
+            self.engine_sprite.visible = False
     
     def on_key_press(self, symbol, modifiers):
         if symbol == key.SPACE:
