@@ -5,7 +5,7 @@ import random
 from pyglet import clock
 
 # Main window
-game_window = pyglet.window.Window(800, 600, vsync=True, double_buffer=False)
+game_window = pyglet.window.Window(800, 600, vsync=True)
 
 # Batches
 main_batch = pyglet.graphics.Batch()
