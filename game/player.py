@@ -73,18 +73,22 @@ class Player(physicalobject.PhysicalObject):
         # Add thrust until velocity = 0 while continually changing the zero vector
         # Come to a stop using main thrusters and spinning the ship
         if self.key_handler[key.DOWN]:
+            if self.velocity_x == 0 and self.velocity_y == 0:
+                self.engine_sprite.visible = False
+                return False
             zero_vector = math.radians(math.atan2(self.velocity_y, self.velocity_x) * 180 / math.pi + 180)
             fake = math.sqrt(self.rotation **2)
             # rotation less than 0, invert to positive
             # rotation less than -360, mod 360
             # rotation greater than 0, invert to negative and add 360
             # rotation greater than 360, mod 360
-            if self.rotation < 0:
-                fake = -self.rotation
-            if self.rotation > 0:
-                fake = (-self.rotation) + 360
-            if self.rotation > 360 or self.rotation < -360:
-                fake = fake % 360
+            if math.radians(fake) != zero_vector:
+                if self.rotation < 0:
+                    fake = -self.rotation
+                if self.rotation > 0:
+                    fake = (-self.rotation) + 360
+                if self.rotation > 360 or self.rotation < -360:
+                    fake = fake % 360
             fake = math.radians(fake)
             # Cartesian quadrant 1
             # Cartesian quadrant 2
@@ -94,16 +98,32 @@ class Player(physicalobject.PhysicalObject):
                 self.rotation -= self.rotate_speed * dt
             elif round(fake, 1) == round(zero_vector, 1):
                  fake = zero_vector
-                 self.rotation = self.rotation - (zero_vector-fake)
-                 #if self.rotation < 0:
-                 #   self.rotation = -1 * zero_vector
-                 #   print "negative - ", -1*zero_vector
-                 #print "True"
+                 if self.rotation < 0:
+                    print "BANG - Rotation = ", self.rotation, " = ", -math.degrees(zero_vector)
+                    self.rotation = -math.degrees(zero_vector)
+                 else:
+                    print "BANG - Rotation = ", self.rotation, " = ", math.degrees(zero_vector)
+                    self.rotation = math.degrees(zero_vector)
+           
+            if fake == zero_vector and (self.velocity_x != 0 or self.velocity_y != 0):
+                if (self.velocity_x < 7 and self.velocity_x > -7) and (self.velocity_y < 7 and self.velocity_y > -7):
+                    self.velocity_x, self.velocity_y = 0.0, 0.0
+                    return False
+                angle_radians = -math.radians(self.rotation)
+                force_x = math.cos(angle_radians) * self.thrust * dt
+                force_y = math.sin(angle_radians) * self.thrust * dt
+                self.velocity_x += force_x
+                self.velocity_y += force_y
+                self.engine_sprite.rotation = self.rotation
+                self.engine_sprite.x = self.x
+                self.engine_sprite.y = self.y
+                self.engine_sprite.visible = True
             
-            #print "fake rot - ", fake
-            print math.radians(self.rotation)
-            print "print zero_vector - ", zero_vector
-            print "rotation is - ", fake
+                 
+
+            print "velocity - ", self.velocity_x, " - ", self.velocity_y
+            print "Rotation -> ", math.radians(self.rotation)
+            print "zero_vector -> ", zero_vector, " = ", fake
             
 
 
