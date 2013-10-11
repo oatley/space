@@ -13,8 +13,8 @@ class Player(physicalobject.PhysicalObject):
         
         # Forward thrust
         self.thrust = 150.0
-        self.max_thrust = 300.0
-        self.max_velocity = 500.0
+        self.max_thrust = 150.0
+        self.max_velocity = 300.0
         # Slow down
         self.alt_thrust = 50.0 
         self.rotate_speed = 200.0
@@ -38,7 +38,7 @@ class Player(physicalobject.PhysicalObject):
         if self.key_handler[key.RIGHT]:
              self.rotation += self.rotate_speed * dt
         #print self.rotation
-        if self.key_handler[key.RSHIFT] or self.key_handler[key.LSHIFT]:
+        if self.key_handler[key.RCTRL] or self.key_handler[key.LCTRL]:
             angle_radians = -math.radians(self.rotation)
             # Slow down the ship, must use positive force
             force_x = math.sqrt((math.cos(angle_radians) * self.alt_thrust * dt)**2)
@@ -119,32 +119,31 @@ class Player(physicalobject.PhysicalObject):
                 self.engine_sprite.x = self.x
                 self.engine_sprite.y = self.y
                 self.engine_sprite.visible = True
+            #print "velocity - ", self.velocity_x, " - ", self.velocity_y
+            #print "Rotation -> ", math.radians(self.rotation)
+            #print "zero_vector -> ", zero_vector, " = ", fake
             
-                 
-
-            print "velocity - ", self.velocity_x, " - ", self.velocity_y
-            print "Rotation -> ", math.radians(self.rotation)
-            print "zero_vector -> ", zero_vector, " = ", fake
-            
-
-
-
         elif self.key_handler[key.UP]:
             angle_radians = -math.radians(self.rotation)
             force_x = math.cos(angle_radians) * self.thrust * dt
             force_y = math.sin(angle_radians) * self.thrust * dt
-            if self.velocity_x <= self.max_velocity and self.velocity_x >= -self.max_velocity and force_x < 0:
-                print "1"
+            
+            if self.velocity_x > self.max_velocity and force_x > 0:
+                force_x = 0
+                self.velocity_x = self.max_velocity
+            elif self.velocity_x < -self.max_velocity and force_x < 0:
+                force_x = 0
+                self.velocity_x = -self.max_velocity
+            elif self.velocity_y > self.max_velocity and force_y > 0:
+                force_y = 0
+                self.velocity_y = self.max_velocity
+            elif self.velocity_y < -self.max_velocity and force_y < 0:
+                force_y = 0
+                self.velocity_y = -self.max_velocity
+            else:
                 self.velocity_x += force_x
-            elif self.velocity_x <= self.max_velocity and self.velocity_x >= -self.max_velocity and force_x > 0:
-                print "2"
-                self.velocity_x += force_x
-            if self.velocity_y <= self.max_velocity and self.velocity_y >= -self.max_velocity and force_y < 0:
-                print "3"
                 self.velocity_y += force_y
-            elif self.velocity_y <= self.max_velocity and self.velocity_y >= -self.max_velocity and force_y > 0:
-                print "4"
-                self.velocity_y += force_y
+            
             print self.rotation
             #print "math.cos(angle_radians) - ", math.cos(angle_radians)
             #print "math.sin(angle_radians) - ", math.sin(angle_radians)
@@ -157,6 +156,39 @@ class Player(physicalobject.PhysicalObject):
             self.engine_sprite.visible = True
         else:
             self.engine_sprite.visible = False
+    
+    
+    def forward_thrust(self, modifier):
+        angle_radians = -math.radians(self.rotation)
+        force_x = (math.cos(angle_radians) * self.thrust * dt) * modifier
+        force_y = (math.sin(angle_radians) * self.thrust * dt) * modifier
+        
+        if (self.velocity_x*modifier) > (self.max_velocity*modifier) and force_x > 0:
+            force_x = 0
+            self.velocity_x = (self.max_velocity*modifier)
+        elif self.velocity_x < (-self.max_velocity and force_x < 0:
+            force_x = 0
+            self.velocity_x = (-self.max_velocity*modifier)
+        elif (self.velocity_y*modifier) > (self.max_velocity*modifier) and force_y > 0:
+            force_y = 0
+            self.velocity_y = (self.max_velocity*modifier)
+        elif (self.velocity_y*modifier) < (-self.max_velocity*modifier) and force_y < 0:
+            force_y = 0
+            self.velocity_y = (-self.max_velocity*modifier)
+        else:
+            self.velocity_x += force_x
+            self.velocity_y += force_y
+            
+        print self.rotation
+        #print "math.cos(angle_radians) - ", math.cos(angle_radians)
+        #print "math.sin(angle_radians) - ", math.sin(angle_radians)
+        print "angle_radians - ", angle_radians
+        print "force - ", force_x, " - ", force_y
+        print "velocity - ", self.velocity_x, " - ", self.velocity_y
+        self.engine_sprite.rotation = self.rotation
+        self.engine_sprite.x = self.x
+        self.engine_sprite.y = self.y
+        self.engine_sprite.visible = True
     
     def on_key_press(self, symbol, modifiers):
         if symbol == key.SPACE:
