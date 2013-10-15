@@ -122,57 +122,32 @@ class Player(physicalobject.PhysicalObject):
             #print "velocity - ", self.velocity_x, " - ", self.velocity_y
             #print "Rotation -> ", math.radians(self.rotation)
             #print "zero_vector -> ", zero_vector, " = ", fake
-            
         elif self.key_handler[key.UP]:
-            angle_radians = -math.radians(self.rotation)
-            force_x = math.cos(angle_radians) * self.thrust * dt
-            force_y = math.sin(angle_radians) * self.thrust * dt
-            
-            if self.velocity_x > self.max_velocity and force_x > 0:
-                force_x = 0
-                self.velocity_x = self.max_velocity
-            elif self.velocity_x < -self.max_velocity and force_x < 0:
-                force_x = 0
-                self.velocity_x = -self.max_velocity
-            elif self.velocity_y > self.max_velocity and force_y > 0:
-                force_y = 0
-                self.velocity_y = self.max_velocity
-            elif self.velocity_y < -self.max_velocity and force_y < 0:
-                force_y = 0
-                self.velocity_y = -self.max_velocity
+            if self.key_handler[key.LSHIFT]:
+                self.forward_thrust(2, dt)
             else:
-                self.velocity_x += force_x
-                self.velocity_y += force_y
-            
-            print self.rotation
-            #print "math.cos(angle_radians) - ", math.cos(angle_radians)
-            #print "math.sin(angle_radians) - ", math.sin(angle_radians)
-            print "angle_radians - ", angle_radians
-            print "force - ", force_x, " - ", force_y
-            print "velocity - ", self.velocity_x, " - ", self.velocity_y
-            self.engine_sprite.rotation = self.rotation
-            self.engine_sprite.x = self.x
-            self.engine_sprite.y = self.y
-            self.engine_sprite.visible = True
+                self.forward_thrust(1, dt)
+        elif self.key_handler[key.LSHIFT]:
+            self.forward_thrust(1, dt)
         else:
             self.engine_sprite.visible = False
     
     
-    def forward_thrust(self, modifier):
+    def forward_thrust(self, modifier, dt):
         angle_radians = -math.radians(self.rotation)
         force_x = (math.cos(angle_radians) * self.thrust * dt) * modifier
         force_y = (math.sin(angle_radians) * self.thrust * dt) * modifier
         
-        if (self.velocity_x*modifier) > (self.max_velocity*modifier) and force_x > 0:
+        if self.velocity_x > (self.max_velocity*modifier) and force_x > 0:
             force_x = 0
             self.velocity_x = (self.max_velocity*modifier)
-        elif self.velocity_x < (-self.max_velocity and force_x < 0:
+        elif self.velocity_x < (-self.max_velocity*modifier) and force_x < 0:
             force_x = 0
             self.velocity_x = (-self.max_velocity*modifier)
-        elif (self.velocity_y*modifier) > (self.max_velocity*modifier) and force_y > 0:
+        elif self.velocity_y > (self.max_velocity*modifier) and force_y > 0:
             force_y = 0
             self.velocity_y = (self.max_velocity*modifier)
-        elif (self.velocity_y*modifier) < (-self.max_velocity*modifier) and force_y < 0:
+        elif self.velocity_y < (-self.max_velocity*modifier) and force_y < 0:
             force_y = 0
             self.velocity_y = (-self.max_velocity*modifier)
         else:
@@ -183,8 +158,8 @@ class Player(physicalobject.PhysicalObject):
         #print "math.cos(angle_radians) - ", math.cos(angle_radians)
         #print "math.sin(angle_radians) - ", math.sin(angle_radians)
         print "angle_radians - ", angle_radians
-        print "force - ", force_x, " - ", force_y
-        print "velocity - ", self.velocity_x, " - ", self.velocity_y
+        print "force - ", force_x*modifier, " - ", force_y*modifier
+        print "velocity - ", self.velocity_x*modifier, " - ", self.velocity_y*modifier
         self.engine_sprite.rotation = self.rotation
         self.engine_sprite.x = self.x
         self.engine_sprite.y = self.y
@@ -199,6 +174,19 @@ class Player(physicalobject.PhysicalObject):
         super(Player, self).delete()
 
     def fire(self):
+        angle_radians = -math.radians(self.rotation)
+        ship_radius = self.image.width/2
+        bullet_x = self.x + math.cos(angle_radians) * ship_radius
+        bullet_y = self.y + math.sin(angle_radians) * ship_radius
+        new_bullet = bullet.Bullet(bullet_x, bullet_y, batch=self.batch)
+
+        bullet_vx = (self.velocity_x + math.cos(angle_radians) * self.bullet_speed)
+        bullet_vy = (self.velocity_y + math.sin(angle_radians) * self.bullet_speed)
+        new_bullet.velocity_x = bullet_vx
+        new_bullet.velocity_y = bullet_vy
+        self.new_objects.append(new_bullet)
+        
+    def fire_missle(self):
         angle_radians = -math.radians(self.rotation)
         ship_radius = self.image.width/2
         bullet_x = self.x + math.cos(angle_radians) * ship_radius
