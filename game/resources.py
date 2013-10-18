@@ -6,6 +6,7 @@ pyglet.resource.reindex()
 player_image = pyglet.resource.image('player.png')
 bullet_image = pyglet.resource.image('bullet.png')
 asteroid_image = pyglet.resource.image('asteroid.png')
+missile_image = pyglet.resource.image('missile.png')
 
 def center_image(image):
     print("Sets an image anchor point to it's center")
@@ -15,6 +16,7 @@ def center_image(image):
 center_image(player_image)
 center_image(bullet_image)
 center_image(asteroid_image)
+center_image(missile_image)
 
 engine_image = pyglet.resource.image('engine_flame.png')
 engine_image.anchor_x = engine_image.width * 1.5

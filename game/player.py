@@ -12,12 +12,12 @@ class Player(physicalobject.PhysicalObject):
         super(Player, self).__init__(img=resources.player_image, *args, **kwargs)
         
         # Forward thrust
-        self.thrust = 150.0
-        self.max_thrust = 150.0
-        self.max_velocity = 300.0
+        self.thrust = 100.0
+        self.max_thrust = 100.0
+        self.max_velocity = 200.0
         # Slow down
         self.alt_thrust = 50.0 
-        self.rotate_speed = 200.0
+        self.rotate_speed = 100.0
         
         self.key_handler = key.KeyStateHandler()
         self.event_handlers = [self, self.key_handler]
@@ -28,6 +28,10 @@ class Player(physicalobject.PhysicalObject):
         self.bullet_speed = 700.0
         self.reacts_to_bullets = False
         self.score = 0
+
+        self.missile_thrust = 200.0
+        self.missile_rot_speed = 100.0
+        self.missile_max_velocity = 300.0
        
 
     def update(self, dt):
@@ -75,7 +79,7 @@ class Player(physicalobject.PhysicalObject):
         # Come to a stop using main thrusters and spinning the ship
         if self.key_handler[key.DOWN]:
             if self.velocity_x == 0 and self.velocity_y == 0:
-                self.engine_sprite.visible = False
+                #self.engine_sprite.visible = False
                 return False
             zero_vector = math.radians(math.atan2(self.velocity_y, self.velocity_x) * 180 / math.pi + 180)
             fake = math.sqrt(self.rotation **2)
@@ -106,23 +110,23 @@ class Player(physicalobject.PhysicalObject):
                     print "BANG - Rotation = ", self.rotation, " = ", math.degrees(zero_vector)
                     self.rotation = math.degrees(zero_vector)
            
-            if fake == zero_vector and (self.velocity_x != 0 or self.velocity_y != 0):
-                if (self.velocity_x < 7 and self.velocity_x > -7) and (self.velocity_y < 7 and self.velocity_y > -7):
-                    self.velocity_x, self.velocity_y = 0.0, 0.0
-                    return False
-                angle_radians = -math.radians(self.rotation)
-                force_x = math.cos(angle_radians) * self.thrust * dt
-                force_y = math.sin(angle_radians) * self.thrust * dt
-                self.velocity_x += force_x
-                self.velocity_y += force_y
-                self.engine_sprite.rotation = self.rotation
-                self.engine_sprite.x = self.x
-                self.engine_sprite.y = self.y
-                self.engine_sprite.visible = True
+            #if fake == zero_vector and (self.velocity_x != 0 or self.velocity_y != 0):
+            #    if (self.velocity_x < 7 and self.velocity_x > -7) and (self.velocity_y < 7 and self.velocity_y > -7):
+            #        self.velocity_x, self.velocity_y = 0.0, 0.0
+            #        return False
+            #    angle_radians = -math.radians(self.rotation)
+            #    force_x = math.cos(angle_radians) * self.thrust * dt
+            #    force_y = math.sin(angle_radians) * self.thrust * dt
+            #    self.velocity_x += force_x
+            #    self.velocity_y += force_y
+            #    self.engine_sprite.rotation = self.rotation
+            #    self.engine_sprite.x = self.x
+            #    self.engine_sprite.y = self.y
+            #    self.engine_sprite.visible = True
             #print "velocity - ", self.velocity_x, " - ", self.velocity_y
             #print "Rotation -> ", math.radians(self.rotation)
             #print "zero_vector -> ", zero_vector, " = ", fake
-        elif self.key_handler[key.UP]:
+        if self.key_handler[key.UP]:
             if self.key_handler[key.LSHIFT]:
                 self.forward_thrust(2, dt)
             else:
@@ -167,7 +171,7 @@ class Player(physicalobject.PhysicalObject):
     
     def on_key_press(self, symbol, modifiers):
         if symbol == key.SPACE:
-            self.fire()
+            self.fire_missile()
              
     def delete(self):
         self.engine_sprite.delete()
@@ -186,7 +190,7 @@ class Player(physicalobject.PhysicalObject):
         new_bullet.velocity_y = bullet_vy
         self.new_objects.append(new_bullet)
         
-    def fire_missle(self):
+    def fire_missile(self):
         angle_radians = -math.radians(self.rotation)
         ship_radius = self.image.width/2
         bullet_x = self.x + math.cos(angle_radians) * ship_radius

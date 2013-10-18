@@ -5,12 +5,12 @@ class Missile(physicalobject.PhysicalObject):
     """Bullet fired by player"""
 
     def __init__(self, *args, **kwargs):
-        super(Bullet, self).__init__(resources.bullet_image, *args, **kwargs)
-        pyglet.clock.schedule_once(self.die, 0.5)
-        self.is_bullet = True
+        super(Missile, self).__init__(resources.missile_image, *args, **kwargs)
+        pyglet.clock.schedule_once(self.die, 2.0)
+        self.is_missile = True
         
     def update(self, dt):
-        super(Bullet, self).update(dt)
+        super(Missile, self).update(dt)
 
     def die(self, dt):
         self.dead = True
