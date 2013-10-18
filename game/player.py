@@ -3,7 +3,7 @@ import physicalobject, resources
 import pyglet
 import math
 from pyglet.window import key
-import bullet
+import bullet, missile
 
 
 class Player(physicalobject.PhysicalObject):
@@ -27,12 +27,9 @@ class Player(physicalobject.PhysicalObject):
 
         self.bullet_speed = 700.0
         self.reacts_to_bullets = False
+        self.reacts_to_missiles = False
         self.score = 0
 
-        self.missile_thrust = 200.0
-        self.missile_rot_speed = 100.0
-        self.missile_max_velocity = 300.0
-       
 
     def update(self, dt):
         super(Player, self).update(dt)
@@ -193,15 +190,13 @@ class Player(physicalobject.PhysicalObject):
     def fire_missile(self):
         angle_radians = -math.radians(self.rotation)
         ship_radius = self.image.width/2
-        bullet_x = self.x + math.cos(angle_radians) * ship_radius
-        bullet_y = self.y + math.sin(angle_radians) * ship_radius
-        new_bullet = bullet.Bullet(bullet_x, bullet_y, batch=self.batch)
+        missile_x = self.x + math.cos(angle_radians) * ship_radius
+        missile_y = self.y + math.sin(angle_radians) * ship_radius
+        new_missile = missile.Missile(missile_x, missile_y, batch=self.batch)
 
-        bullet_vx = (self.velocity_x + math.cos(angle_radians) * self.bullet_speed)
-        bullet_vy = (self.velocity_y + math.sin(angle_radians) * self.bullet_speed)
-        new_bullet.velocity_x = bullet_vx
-        new_bullet.velocity_y = bullet_vy
-        self.new_objects.append(new_bullet)
+        new_missile.rotation = self.rotation
+
+        self.new_objects.append(new_missile)
         
         
 

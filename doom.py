@@ -16,10 +16,10 @@ level_label = pyglet.text.Label(text='My Game', x=400, y=575, anchor_x='center',
 
 # Sprites
 player_ship = player.Player(x=400, y=300, batch=main_batch)
-#asteroids = load.asteroids(15, player_ship.position, main_batch)
+asteroids = load.asteroids(1, player_ship.position, main_batch)
 #player_lives = load.player_lives(3, main_batch)
 
-game_objects = [player_ship]
+game_objects = [player_ship] + asteroids
 #game_window.push_handlers(player_ship.key_handler)
 
 # Add any specified event handlers to the event handler stack
@@ -52,6 +52,7 @@ def update(dt):
     
     # Go through the list and remove dead objects 
     for to_remove in [obj for obj in game_objects if obj.dead]:
+        to_remove.die(dt)
         to_remove.delete()
         game_objects.remove(to_remove)
     

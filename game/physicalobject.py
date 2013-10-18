@@ -11,6 +11,9 @@ class PhysicalObject(pyglet.sprite.Sprite):
         self.event_handlers = []
         self.reacts_to_bullets = True
         self.is_bullet = False
+        self.reacts_to_missiles = True
+        self.is_missile = False
+        self.is_explosion = False
 
     def update(self, dt):
         self.x += self.velocity_x * dt
@@ -31,17 +34,28 @@ class PhysicalObject(pyglet.sprite.Sprite):
         elif self.y > max_y:
             self.y = min_y
 
+    def die(self, dt):
+        print self.dead
+
     def collides_with(self, other_object):
         if not self.reacts_to_bullets and other_object.is_bullet:
             return False
         if self.is_bullet and not other_object.reacts_to_bullets:
+            return False
+        if not self.reacts_to_missiles and other_object.is_missile:
             return False
         collision_distance = self.image.width/2 + other_object.image.width/2
         actual_distance = util.distance(self.position, other_object.position)
         return (actual_distance <= collision_distance)
 
     def handle_collision_with(self, other_object):
+        #if type(Missile) == type(self):
+        #    self.dead = True
         if type(other_object) == type(self):
             self.dead = False
+            if self.is_missile:
+                self.dead = True
+                other_object.dead = True
         else:
             self.dead = True
+            other_object.dead = True
